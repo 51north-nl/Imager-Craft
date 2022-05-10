@@ -12,10 +12,11 @@ namespace aelvan\imager;
 
 use Craft;
 use craft\base\Element;
+use craft\base\Model;
 use craft\base\Plugin;
 use craft\elements\Asset;
 use craft\events\GetAssetThumbUrlEvent;
-use craft\events\GetAssetUrlEvent;
+use craft\events\DefineAssetUrlEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterElementActionsEvent;
 use craft\events\ReplaceAssetEvent;
@@ -172,8 +173,8 @@ class Imager extends Plugin
         );
 
         // Event listener for overriding Craft's internal transform functionality
-        Event::on(Assets::class, Assets::EVENT_GET_ASSET_URL,
-            function (GetAssetUrlEvent $event) {
+        Event::on(Asset::class, Asset::EVENT_DEFINE_URL,
+            function (DefineAssetUrlEvent $event) {
                 $config = ImagerService::getConfig();
 
                 if ($config->useForNativeTransforms && $event->asset !== null && $event->transform !== null && $event->asset->kind === 'image' && \in_array(strtolower($event->asset->getExtension()), Image::webSafeFormats(), true)) {
@@ -212,7 +213,7 @@ class Imager extends Plugin
         );
 
         // Event listener for overriding Craft's internal thumb url
-        Event::on(Assets::class, Assets::EVENT_GET_ASSET_THUMB_URL,
+        Event::on(Assets::class, Assets::EVENT_DEFINE_THUMB_URL,
             function (GetAssetThumbUrlEvent $event) {
                 $config = ImagerService::getConfig();
 
@@ -244,7 +245,7 @@ class Imager extends Plugin
     /**
      * @inheritdoc
      */
-    protected function createSettingsModel()
+	protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }
