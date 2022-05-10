@@ -62,7 +62,6 @@ use aelvan\imager\effects\TintEffect;
 use aelvan\imager\effects\UnsharpMaskEffect;
 
 use aelvan\imager\optimizers\GifsicleOptimizer;
-use aelvan\imager\optimizers\ImageoptimOptimizer;
 use aelvan\imager\optimizers\JpegoptimOptimizer;
 use aelvan\imager\optimizers\JpegtranOptimizer;
 use aelvan\imager\optimizers\KrakenOptimizer;
@@ -292,7 +291,6 @@ class Imager extends Plugin
         ImagerService::registerOptimizer('gifsicle', GifsicleOptimizer::class);
         ImagerService::registerOptimizer('tinypng', TinypngOptimizer::class);
         ImagerService::registerOptimizer('kraken', KrakenOptimizer::class);
-        ImagerService::registerOptimizer('imageoptim', ImageoptimOptimizer::class);
     }
 
     /**
