@@ -44,7 +44,7 @@
     "extra": {
         "name": "Imager",
         "handle": "imager",
-        "schemaVersion": "2.0.0",
+        "schemaVersion": "3.0.0",
         "hasCpSettings": false,
         "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/aelvan/Imager-Craft/craft3/CHANGELOG.md",

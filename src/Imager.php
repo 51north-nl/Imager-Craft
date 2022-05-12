@@ -15,7 +15,7 @@ use craft\base\Element;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\elements\Asset;
-use craft\events\GetAssetThumbUrlEvent;
+use craft\events\DefineAssetThumbUrlEvent;
 use craft\events\DefineAssetUrlEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterElementActionsEvent;
@@ -214,7 +214,7 @@ class Imager extends Plugin
 
         // Event listener for overriding Craft's internal thumb url
         Event::on(Assets::class, Assets::EVENT_DEFINE_THUMB_URL,
-            function (GetAssetThumbUrlEvent $event) {
+            function (DefineAssetThumbUrlEvent $event) {
                 $config = ImagerService::getConfig();
 
                 if ($config->useForCpThumbs && $event->asset !== null && $event->asset->kind === 'image' && \in_array(strtolower($event->asset->getExtension()), Image::webSafeFormats(), true)) {

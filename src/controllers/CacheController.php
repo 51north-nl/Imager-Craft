@@ -26,10 +26,10 @@ class CacheController extends Controller
     // Protected Properties
     // =========================================================================
 
-    /**
-     * @var array
-     */
-    protected $allowAnonymous = ['actionClearTransforms', 'actionClearRemoteImages'];
+	/**
+	 * @var int|bool|array
+	 */
+	protected int|bool|array $allowAnonymous = ['actionClearTransforms', 'actionClearRemoteImages'];
 
     // Public Methods
     // =========================================================================
