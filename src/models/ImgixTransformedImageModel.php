@@ -11,12 +11,12 @@ use aelvan\imager\helpers\ImagerHelpers;
 use aelvan\imager\services\ImagerService;
 use aelvan\imager\exceptions\ImagerException;
 
-class ImgixTransformedImageModel implements TransformedImageInterface
+class ImgixTransformedImageModel implements TransformedImageInterface, \Stringable
 {
     /**
      * @var string
      */
-    public $path;
+    public $path = '';
     
     /**
      * @var string
@@ -31,32 +31,27 @@ class ImgixTransformedImageModel implements TransformedImageInterface
     /**
      * @var string
      */
-    public $extension;
+    public $extension = '';
     
     /**
      * @var string
      */
-    public $mimeType;
+    public $mimeType = '';
     
     /**
      * @var int
      */
-    public $width;
+    public $width = 0;
     
     /**
      * @var int
      */
-    public $height;
+    public $height = 0;
     
     /**
      * @var int|float
      */
-    public $size;
-
-    /**
-     * @var ImgixSettings|null
-     */
-    private $profileConfig;
+    public $size = 0;
 
     /**
      * ImgixTransformedImageModel constructor.
@@ -64,30 +59,20 @@ class ImgixTransformedImageModel implements TransformedImageInterface
      * @param string|null        $imageUrl
      * @param Asset|string|null  $source
      * @param array|null         $params
-     * @param ImgixSettings|null $config
+     * @param ImgixSettings|null $profileConfig
      *
      * @throws ImagerException
      */
-    public function __construct($imageUrl = null, $source = null, $params = null, $config = null)
+    public function __construct($imageUrl = null, $source = null, $params = null, private ?\aelvan\imager\models\ImgixSettings $profileConfig = null)
     {
-        $this->profileConfig = $config;
-
-        $this->path = '';
-        $this->extension = '';
-        $this->mimeType = '';
-        $this->size = 0;
-
         if ($imageUrl !== null) {
             $this->url = $imageUrl;
         }
 
-        $this->width = 0;
-        $this->height = 0;
-
 
         if (isset($params['w'], $params['h'])) {
             if (($source !== null) && ($params['fit'] === 'min' || $params['fit'] === 'max')) {
-                list($sourceWidth, $sourceHeight) = $this->getSourceImageDimensions($source);
+                [$sourceWidth, $sourceHeight] = $this->getSourceImageDimensions($source);
 
                 $paramsW = (int)$params['w'];
                 $paramsH = (int)$params['h'];
@@ -109,7 +94,7 @@ class ImgixTransformedImageModel implements TransformedImageInterface
             if (isset($params['w']) || isset($params['h'])) {
 
                 if ($source !== null && $params !== null) {
-                    list($sourceWidth, $sourceHeight) = $this->getSourceImageDimensions($source);
+                    [$sourceWidth, $sourceHeight] = $this->getSourceImageDimensions($source);
 
                     if ((int)$sourceWidth === 0 || (int)$sourceHeight === 0) {
                         if (isset($params['w'])) {
@@ -119,7 +104,7 @@ class ImgixTransformedImageModel implements TransformedImageInterface
                             $this->height = (int)$params['h'];
                         }
                     } else {
-                        list($w, $h) = $this->calculateTargetSize($params, $sourceWidth, $sourceHeight);
+                        [$w, $h] = $this->calculateTargetSize($params, $sourceWidth, $sourceHeight);
 
                         $this->width = $w;
                         $this->height = $h;
@@ -127,7 +112,7 @@ class ImgixTransformedImageModel implements TransformedImageInterface
                 }
             } else {
                 // Neither is set, image is not resized. Just get dimensions and return.
-                list($sourceWidth, $sourceHeight) = $this->getSourceImageDimensions($source);
+                [$sourceWidth, $sourceHeight] = $this->getSourceImageDimensions($source);
                 
                 $this->width = $sourceWidth;
                 $this->height = $sourceHeight;
@@ -138,7 +123,6 @@ class ImgixTransformedImageModel implements TransformedImageInterface
     /**
      * @param $source
      *
-     * @return array
      * @throws ImagerException
      */
     protected function getSourceImageDimensions($source): array
@@ -163,8 +147,6 @@ class ImgixTransformedImageModel implements TransformedImageInterface
      * @param $params
      * @param $sourceWidth
      * @param $sourceHeight
-     *
-     * @return array
      */
     protected function calculateTargetSize($params, $sourceWidth, $sourceHeight): array
     {
@@ -205,57 +187,36 @@ class ImgixTransformedImageModel implements TransformedImageInterface
         return [$w ?: 0, $h ?: 0];
     }
 
-    /**
-     * @return string
-     */
     public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * @return string
-     */
     public function getFilename(): string
     {
         return $this->filename;
     }
 
-    /**
-     * @return string
-     */
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * @return string
-     */
     public function getExtension(): string
     {
         return $this->extension;
     }
 
-    /**
-     * @return string
-     */
     public function getMimeType(): string
     {
         return $this->mimeType;
     }
 
-    /**
-     * @return int
-     */
     public function getWidth(): int
     {
         return (int)$this->width;
     }
 
-    /**
-     * @return int
-     */
     public function getHeight(): int
     {
         return (int)$this->height;
@@ -264,33 +225,22 @@ class ImgixTransformedImageModel implements TransformedImageInterface
     /**
      * @param string $unit
      * @param int    $precision
-     *
-     * @return float|int
      */
-    public function getSize($unit = 'b', $precision = 2)
+    public function getSize($unit = 'b', $precision = 2): float|int
     {
         return $this->size;
     }
 
-    /**
-     * @return string
-     */
     public function getDataUri(): string
     {
         return '';
     }
 
-    /**
-     * @return string
-     */
     public function getBase64Encoded(): string
     {
         return '';
     }
 
-    /**
-     * @return bool
-     */
     public function getIsNew(): bool
     {
         return false;
@@ -299,7 +249,7 @@ class ImgixTransformedImageModel implements TransformedImageInterface
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return (string)$this->url;
     }

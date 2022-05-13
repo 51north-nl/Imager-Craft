@@ -29,7 +29,7 @@ use Imagine\Image\Box;
  */
 class PlaceholderService extends Component
 {
-    private $defaults = [
+    private array $defaults = [
         'type' => 'svg',
         'width' => 1,
         'height' => 1,
@@ -42,32 +42,25 @@ class PlaceholderService extends Component
 
     /**
      * Main public placeholder method.
-     * 
+     *
      * @param array|null $config
-     * @return string
      * @throws ImagerException
      */
     public function placeholder($config = null): string
     {
         $config = array_merge($this->defaults, $config ?? []);
-
-        switch ($config['type']) {
-            case 'svg':
-                return $this->placeholderSVG($config);
-            case 'gif':
-                return $this->placeholderGIF($config);
-            case 'silhouette':
-                return $this->placeholderSilhuette($config);
-        }
-
-        return '';
+        return match ($config['type']) {
+            'svg' => $this->placeholderSVG($config),
+            'gif' => $this->placeholderGIF($config),
+            'silhouette' => $this->placeholderSilhuette($config),
+            default => '',
+        };
     }
 
     /**
      * Returns a SVG placeholder
-     * 
+     *
      * @param $config
-     * @return string
      */
     private function placeholderSVG($config): string
     {
@@ -80,9 +73,8 @@ class PlaceholderService extends Component
 
     /**
      * Returns a GIF placeholder.
-     * 
+     *
      * @param $config
-     * @return string
      */
     private function placeholderGIF($config): string
     {
@@ -117,9 +109,8 @@ class PlaceholderService extends Component
 
     /**
      * Returns a silhouette placeholder.
-     * 
+     *
      * @param $config
-     * @return string
      * @throws ImagerException
      */
     private function placeholderSilhuette($config): string
@@ -137,7 +128,7 @@ class PlaceholderService extends Component
         try {
             $sourceModel = new LocalSourceImageModel($source);
             $sourceModel->getLocalCopy();
-        } catch (ImagerException $e) {
+        } catch (ImagerException) {
             return '';
         }
         
@@ -166,7 +157,7 @@ class PlaceholderService extends Component
             if ($imageDriver === 'imagick') {
                 return new \Imagine\Imagick\Imagine();
             }
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             // just ignore for now
         }
 

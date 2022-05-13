@@ -13,7 +13,7 @@ use Imagine\Image\Box;
 
 use yii\base\InvalidConfigException;
 
-class CraftTransformedImageModel implements TransformedImageInterface
+class CraftTransformedImageModel implements TransformedImageInterface, \Stringable
 {
     /**
      * @var string
@@ -107,65 +107,41 @@ class CraftTransformedImageModel implements TransformedImageInterface
         }
     }
 
-    /**
-     * @return string
-     */
     public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * @return string
-     */
     public function getFilename(): string
     {
         return $this->filename;
     }
 
-    /**
-     * @return string
-     */
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * @return string
-     */
     public function getExtension(): string
     {
         return $this->extension;
     }
 
-    /**
-     * @return string
-     */
     public function getMimeType(): string
     {
         return $this->mimeType;
     }
 
-    /**
-     * @return int
-     */
     public function getWidth(): int
     {
         return $this->width;
     }
 
-    /**
-     * @return int
-     */
     public function getHeight(): int
     {
         return $this->height;
     }
 
-    /**
-     * @return bool
-     */
     public function getIsNew(): bool 
     {
         return $this->isNew;
@@ -174,47 +150,31 @@ class CraftTransformedImageModel implements TransformedImageInterface
     /**
      * @param string $unit
      * @param int $precision
-     *
-     * @return float|int
      */
-    public function getSize($unit = 'b', $precision = 2)
+    public function getSize($unit = 'b', $precision = 2): float|int
     {
         $unit = strtolower($unit);
-
-        switch ($unit) {
-            case 'g':
-            case 'gb':
-                return round(((int)$this->size) / 1024 / 1024 / 1024, $precision);
-            case 'm':
-            case 'mb':
-                return round(((int)$this->size) / 1024 / 1024, $precision);
-            case 'k':
-            case 'kb':
-                return round(((int)$this->size) / 1024, $precision);
-        }
-
-        return $this->size;
+        return match ($unit) {
+            'g', 'gb' => round(((int)$this->size) / 1024 / 1024 / 1024, $precision),
+            'm', 'mb' => round(((int)$this->size) / 1024 / 1024, $precision),
+            'k', 'kb' => round(((int)$this->size) / 1024, $precision),
+            default => $this->size,
+        };
     }
 
-    /**
-     * @return string
-     */
     public function getDataUri(): string
     {
         $imageData = $this->getBase64Encoded();
         return sprintf('data:image/%s;base64,%s', $this->extension, $imageData);
     }
 
-    /**
-     * @return string
-     */
     public function getBase64Encoded(): string
     {
         $image = @file_get_contents($this->path);
         return base64_encode($image);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string)$this->url;
     }

@@ -8,10 +8,7 @@ use aelvan\imager\services\ImagerService;
 
 class ConfigModel extends Settings
 {
-    /**
-     * @var string
-     */
-    private $configOverrideString = '';
+    private string $configOverrideString = '';
 
     /**
      * TransformSettings constructor.
@@ -75,8 +72,6 @@ class ConfigModel extends Settings
 
     /**
      * Returns config override string for this config model
-     *
-     * @return string
      */
     public function getConfigOverrideString(): string
     {

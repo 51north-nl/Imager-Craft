@@ -43,7 +43,7 @@ class ImgixService extends Component
     /**
      *  The Imgix API endpoint for purging images
      */
-    const PURGE_ENDPOINT = 'https://api.imgix.com/v2/image/purger';
+    public const PURGE_ENDPOINT = 'https://api.imgix.com/v2/image/purger';
 
     /**
      * @var bool If purging is enabled or not
@@ -53,8 +53,6 @@ class ImgixService extends Component
     /**
      * Purging is possible if there's an `imgixConfig` map, and all sources/profiles have an API key set
      * Used for determining if the ImgixPurgeElementAction element action and various related event handlers should be bootstrapped or not
-     *
-     * @return bool
      */
     public static function getCanPurge(): bool
     {

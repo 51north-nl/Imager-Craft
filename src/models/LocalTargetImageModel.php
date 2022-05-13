@@ -51,8 +51,6 @@ class LocalTargetImageModel
 
     /**
      * Get file path
-     * 
-     * @return string
      */
     public function getFilePath(): string
     {
@@ -61,11 +59,9 @@ class LocalTargetImageModel
 
     /**
      * Creates target filename base on source and transform
-     * 
+     *
      * @param LocalSourceImageModel $source
      * @param array                 $transform
-     *
-     * @return string
      */
     private function createTargetFilename($source, $transform): string
     {

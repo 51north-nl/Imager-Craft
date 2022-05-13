@@ -9,10 +9,8 @@ trait RunShellCommandTrait
 {
     /**
      * Runs a shell command through mikehaertl\shellcommand
-     * 
-     * @param $commandString
      *
-     * @return string
+     * @param $commandString
      */
     private static function runShellCommand($commandString): string
     {

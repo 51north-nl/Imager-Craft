@@ -200,12 +200,6 @@ class ImagerService extends Component
     }
 
 
-    // Static public Methods
-    // =========================================================================
-
-    /**
-     * @return ConfigModel
-     */
     public static function getConfig(): ConfigModel
     {
         return self::$transformConfig ?? new ConfigModel(Plugin::$plugin->getSettings(), null);
@@ -227,9 +221,6 @@ class ImagerService extends Component
         }
     }
 
-    /**
-     * @return bool
-     */
     public static function hasSupportForWebP(): bool
     {
         self::detectImageDriver();
@@ -289,9 +280,7 @@ class ImagerService extends Component
 
     // Public Methods
     // =========================================================================
-
     /**
-     * @param Asset|string $image
      * @param array        $transforms
      * @param array        $transformDefaults
      * @param array        $configOverrides
@@ -299,7 +288,7 @@ class ImagerService extends Component
      * @return array|TransformedImageInterface|null
      * @throws ImagerException
      */
-    public function transformImage($image, $transforms, $transformDefaults = null, $configOverrides = null)
+    public function transformImage(\craft\elements\Asset|string $image, $transforms, $transformDefaults = null, $configOverrides = null)
     {
         if (!$image) {
             return null;
@@ -359,8 +348,6 @@ class ImagerService extends Component
      *
      * @param array|mixed  $images
      * @param string $descriptor
-     *
-     * @return string
      */
     public function srcset($images, $descriptor = 'w'): string
     {
@@ -410,7 +397,6 @@ class ImagerService extends Component
      *
      * @param $asset
      *
-     * @return bool
      * @throws ImagerException
      */
     public function isAnimated($asset): bool
@@ -442,8 +428,6 @@ class ImagerService extends Component
 
     /**
      * Remove transforms for a given asset
-     *
-     * @param Asset $asset
      */
     public function removeTransformsForAsset(Asset $asset)
     {
@@ -453,12 +437,10 @@ class ImagerService extends Component
             $sourceModel = new LocalSourceImageModel($asset);
             $targetModel = new LocalTargetImageModel($sourceModel, []);
 
-            if (strpos($targetModel->path, $config->imagerSystemPath) !== false) {
+            if (str_contains($targetModel->path, $config->imagerSystemPath)) {
                 try {
                     FileHelper::clearDirectory(FileHelper::normalizePath($targetModel->path));
-                } catch (ErrorException $e) {
-                    Craft::error('Could not clear directory "'.$targetModel->path.'" ('.$e->getMessage().')', __METHOD__);
-                } catch (InvalidParamException $e) {
+                } catch (ErrorException|InvalidParamException $e) {
                     Craft::error('Could not clear directory "'.$targetModel->path.'" ('.$e->getMessage().')', __METHOD__);
                 }
 
@@ -486,9 +468,7 @@ class ImagerService extends Component
 
         try {
             FileHelper::clearDirectory(FileHelper::normalizePath($path));
-        } catch (ErrorException $e) {
-            Craft::error('Could not clear directory "'.$path.'" ('.$e->getMessage().')', __METHOD__);
-        } catch (InvalidParamException $e) {
+        } catch (ErrorException|InvalidParamException $e) {
             Craft::error('Could not clear directory "'.$path.'" ('.$e->getMessage().')', __METHOD__);
         }
     }
@@ -502,9 +482,7 @@ class ImagerService extends Component
 
         try {
             FileHelper::clearDirectory(FileHelper::normalizePath($path));
-        } catch (ErrorException $e) {
-            Craft::error('Could not clear directory "'.$path.'" ('.$e->getMessage().')', __METHOD__);
-        } catch (InvalidParamException $e) {
+        } catch (ErrorException|InvalidParamException $e) {
             Craft::error('Could not clear directory "'.$path.'" ('.$e->getMessage().')', __METHOD__);
         }
     }
@@ -527,13 +505,10 @@ class ImagerService extends Component
 
     // Private Methods
     // =========================================================================
-
     /**
      * Fills in the missing transform objects
      *
      * @param array $transforms
-     *
-     * @return array
      */
     private function fillTransforms($transforms): array
     {
@@ -575,8 +550,6 @@ class ImagerService extends Component
      *
      * @param array $transforms
      * @param array $defaults
-     *
-     * @return array
      */
     private function mergeTransforms($transforms, $defaults): array
     {
@@ -593,11 +566,9 @@ class ImagerService extends Component
      * Merges default transform object into an array of transforms
      *
      * @param array $transforms
-     * @param Asset|string $image
      *
-     * @return array
      */
-    private function normalizeTransforms($transforms, $image): array
+    private function normalizeTransforms($transforms, \craft\elements\Asset|string $image): array
     {
         $r = [];
 
@@ -612,11 +583,9 @@ class ImagerService extends Component
      * Normalize transform object and values
      *
      * @param array $transform
-     * @param Asset|string $image
      *
-     * @return array
      */
-    private function normalizeTransform($transform, $image): array
+    private function normalizeTransform($transform, \craft\elements\Asset|string $image): array
     {
         // if resize mode is not crop or croponly, remove position
         if (isset($transform['mode'], $transform['position']) && (($transform['mode'] !== 'crop') && ($transform['mode'] !== 'croponly'))) {
