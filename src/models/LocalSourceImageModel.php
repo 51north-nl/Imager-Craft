@@ -16,6 +16,7 @@ use craft\base\LocalVolumeInterface;
 use craft\base\Volume;
 use craft\helpers\FileHelper;
 use craft\elements\Asset;
+use craft\helpers\Assets;
 use craft\helpers\StringHelper;
 
 
@@ -129,6 +130,11 @@ class LocalSourceImageModel
         return FileHelper::normalizePath($this->path.'/'.$this->filename);
     }
 
+	public function getTemporaryFilePath(): string
+	{
+		return FileHelper::normalizePath($this->path . '/~' . $this->filename);
+	}
+
     /**
      * Get a local copy of source file
      *
@@ -142,15 +148,29 @@ class LocalSourceImageModel
         if ($this->type !== 'local') {
             if (!file_exists($this->getFilePath()) || (($config->cacheDurationRemoteFiles !== false) && ((FileHelper::lastModifiedTime($this->getFilePath()) + $config->cacheDurationRemoteFiles) < time()))) {
                 if ($this->asset && $this->type === 'volume') {
-                    /** @var Volume $volume */
-                    try {
-                        $volume = $this->asset->getVolume();
-                    } catch (InvalidConfigException $e) {
-                        Craft::error($e->getMessage(), __METHOD__);
-                        throw new ImagerException($e->getMessage(), $e->getCode(), $e);
-                    }
+	                try {
+		                $fs = $this->asset->getVolume()->getFs();
+	                } catch (InvalidConfigException $invalidConfigException) {
+		                Craft::error($invalidConfigException->getMessage(), __METHOD__);
+		                throw new ImagerException($invalidConfigException->getMessage(), $invalidConfigException->getCode(), $invalidConfigException);
+	                }
 
-                    $volume->saveFileLocally($this->asset->getPath(), $this->getFilePath());
+	                // catch any AssetException and rethrow as ImagerException
+	                try {
+		                // If a temp file already exists, something went wrong last time, let's delete it and not assume that the Volume will handle it
+		                if (file_exists($this->getTemporaryFilePath())) {
+			                @unlink($this->getTemporaryFilePath());
+		                }
+
+		                Assets::downloadFile($fs, $this->asset->getPath(), $this->getTemporaryFilePath());
+	                } catch (Exception $e) {
+		                throw new ImagerException($e->getMessage(), $e->getCode(), $e);
+	                }
+
+	                if (file_exists($this->getTemporaryFilePath())) {
+		                copy($this->getTemporaryFilePath(), $this->getFilePath());
+		                @unlink($this->getTemporaryFilePath());
+	                }
                 }
 
                 if ($this->type === 'remoteurl') {
